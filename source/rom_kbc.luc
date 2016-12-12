@@ -1,0 +1,29 @@
+module rom_kbc #(
+    CHANNELS = 1
+  ) (
+    input step [20],
+    output done,
+    output frame [16],
+    output note [CHANNELS][8]
+  ) {
+  
+  sig n [CHANNELS][8];
+  
+   always {
+    done = 0;
+    frame = 0;
+    n = CHANNELSx{{8hff}};
+    case ( step ) {
+      0: n[0] = 77; 
+      548: n[0] = 79;
+      1060: n[0] = 80;
+      1436: n[0] = 77;   
+      1780: n[0] = 79;   
+      2152: n[0] = 80;  
+      2480: n[0] = 82;   
+      2820: n[0] = 84;   
+      5900: done = 1;  
+    }
+    note = n;
+  }
+}

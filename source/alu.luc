@@ -1,0 +1,95 @@
+/*
+
+   For combining all the different modules into one ALU
+   
+ */
+
+
+
+module alu (
+    input alufn[6],  // 6 bit inputs to the alu
+    input a[8],      // 8 bit inputs as a
+    input b[8],      // 8 bit inputs as b
+    output result[8],// 8 bit result
+    output isNeg     // value of n from adder (boolean)
+    
+  ) {
+  
+
+// Importing components
+    
+  addsubt adder1;
+  shifters shift;
+  boolean bool;
+  compare comp;
+  
+  
+
+//ALUFN values for operations  
+  const ADD = 6b0;        //000000
+  const SUB = 6b1;        //000001
+  const AND = 6b011000;   //011000
+  const OR = 6b011110;    //011110
+  const XOR = 6b010110;   
+  const SAME = 6b011010;  
+  const SHL = 6b100000;   
+  const SHR = 6b100001;
+  const SRA = 6b100011;
+  const CMPEQ = 6b110011; 
+  const CMPLT = 6b110101; 
+  const CMPLE = 6b110111;
+  const MULT = 6b000010;  //000010  
+  
+  always {
+    
+    isNeg = 0; //setting defaulters
+  
+// adder initialization    
+    adder1.a = a;                 //input a is a
+    adder1.b = b;                 //input b is b
+    adder1.alufn=alufn;           //input alufn uses all 6 bits of the alufn
+    
+      
+    
+// boolean initialization
+    bool.a = a;                   
+    bool.b = b;
+    bool.alufn = alufn[3:0];      //use only bits [3:0] for boolean input
+    
+// shifter initialization
+     shift.a = a ; //a
+     shift.b = b  ; //b
+     shift.alufn2 = alufn[1:0];   //use only bits [1:0] for shifter input (SHL, SHR, SRA)
+      
+
+// comparator initializatoion       
+      comp.z = adder1.z;           // use z from the adder output
+      comp.v = adder1.v;           // use v from the adder output
+      comp.n = adder1.n;           // use n from the adder output
+      comp.alufn = alufn;          // all bits for comparator
+    
+    
+// calculating result output
+
+  if(alufn == ADD || alufn == SUB || alufn == MULT){                                                 // call addsub.luc
+           isNeg = adder1.n;
+           result = adder1.sum;     
+  }
+  else if (alufn == AND || alufn == OR || alufn == XOR || alufn == XOR || alufn == SAME){            // call boolean.luc
+           result = bool.gate;      
+  }
+  
+  else if (alufn == SHL || alufn == SHR || alufn == SRA){                                             // call shifters.luc
+           result = shift.shifting; 
+  }
+    
+    
+  else if (alufn == CMPEQ || alufn == CMPLE || alufn == CMPLT){                                        // call comparator.luc
+           result = comp.cmp1;     
+  }
+    
+  else {                                                                                               // start result = no output
+          result = 0;      
+  }
+}
+}

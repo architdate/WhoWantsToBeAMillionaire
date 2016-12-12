@@ -1,0 +1,53 @@
+/*
+
+   Adder Circuit. Handles addition multiplication and subtraction.
+   
+ */
+
+module addsubt (
+    input a[8],          //8 bit input for a  
+    input b[8],          //8 bit input for b
+    input alufn[6],      //6 bit input for the ALU function
+    output sum[8],       //8 bit output for the sum
+    output z,            //if all are zeroes
+    output v,            //boolean for overload case
+    output n             //boolean for negative case
+    
+  ) {
+
+  sig outm[32];          //variable for multiplication for upto 8 binary digits
+  sig out[8];            //storing output other than multiplication
+  sig ssum[8];           //storing the sum for subtraction
+  always {
+    
+    if(alufn==6b000001){
+      out=a-b;           //subtraction
+    }
+
+    else if(alufn==6b000010){
+      outm=a*b;          //multiplication
+      out=outm[7:0];
+    }
+
+
+    else{
+      out=a+b;            //addition
+      
+    }
+  
+
+    sum=out[7:0];         //setting output
+    ssum=a-b; 
+
+
+    
+    
+    z = ~|ssum;            //Setting Z
+
+    
+    v = (a[7] & ~b[7] & (~ssum[7])) | ((~a[7])&(b[7])&ssum[7]); //Setting V 
+
+    n=ssum[7];             //most significant digit is the sign bit
+    
+  }
+}

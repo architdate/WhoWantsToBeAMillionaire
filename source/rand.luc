@@ -1,0 +1,55 @@
+module rand (
+    input io_dip[3][8],
+    output out
+    
+    
+  ) {
+  
+  const A = 3b101;
+  //const SEED = 2b1;
+  const C = 2b1;
+  const M = 2b10;
+  
+  sig aout[3];
+  //sig seed[2];
+  sig bout;
+  sig start[2];
+  
+  //sig i;
+  //const X = 10;
+  //sig rst;
+  
+  
+  
+  always {
+    start = 2b1;
+    if(io_dip[2][7]){
+      
+      aout = (A*start)+C;
+      bout = aout - (aout/M * M); // mod function       
+    }
+    else{
+      bout = 2b0;
+    }
+    //out=bout;
+    if(bout!=2b0){
+      start = bout;
+      aout = (A*start)+C;
+      bout = aout - (aout/M * M);
+    }
+    out=bout;
+    
+    
+        
+      
+    
+    
+    
+   
+      
+   
+        
+        
+    
+    }    
+}

@@ -1,0 +1,522 @@
+module mojo_top (
+    input clk,              // 50MHz clock
+    input rst_n,            // reset button (active low)
+    output led [8],         // 8 user controllable LEDs
+    output spi_miso,        // AVR SPI MISO
+    output spi_channel [4], // AVR general purpose pins (used by default to select ADC channel)
+    output avr_rx,          // AVR RX (FPGA TX)
+    input io_dip [3][8],     // DIP switches on IO Shield
+    input button1,
+    input button2,
+    input button3,
+    input button4,
+    input button5,
+    input button6,
+    input button7,
+    input button8,
+    output pin_a,
+    output pin_b,
+    output pin_c,
+    output pin_d,
+    output pin_e,
+    output pin_f,
+    output pin_g,
+    output pin_h,
+    output pin_i,
+    output pin_j,
+    output pin_k,
+    output pin_l,
+    output pin_m,
+    output pin_n,
+    output pin_o,
+    output pin_p,
+    output pin_q,
+    output pin_r,
+    output pin_s,
+    output pin_t,
+    output pin_u,
+    output pin_v,
+    output pin_1, 
+    output pin_2,
+    output pin_3,
+    output pin_4,
+    output pin_5,
+    output pin_6,
+    output pin_7,
+    output pin_8,
+    output pin_9,
+    output pin_10,
+    output pin_11,    
+    output pin_12,
+    output pin_13,
+    output pin_14,
+    output pin_15,
+    output pin_16,
+    output pin_17,
+    output pin_18,
+    output pin_19,
+    output pin_20,
+    output pin_21,
+    output pin_22,
+    //output pin_23,
+    output pin_24,
+    output pin_25,
+    output pin_26,
+    output pin_27,
+    output pin_28,
+    output pin_29,
+    output pin_30,
+    output pin_31,
+    output pin_32,
+    output pin_33,
+    output pin_34,
+    output pin_35,
+    output pin_36,
+    output pin_37,
+    output pin_38,
+    output pin_39,
+    output pin_40,
+    output pin_41,
+    output pin_42,
+    output pin_43,
+    output pin_44,
+    output score_1,
+    output score_2,
+    output score_3,
+    output score_4,
+    output score_5,
+    output score_6,
+    output score_7,
+    output score_8,
+    output score_9,
+    output audio
+    
+  ) {
+  
+  sig rst;                  // reset signal
+  
+  .clk(clk) {
+    // The reset conditioner is used to synchronize the reset signal to the FPGA
+    // clock. This ensures the entire FPGA comes out of reset at the same time.
+    reset_conditioner reset_cond;
+    .rst(rst) {
+      fsm state = {DIFF,START,END,FINISH};       // states
+      dff counter[40]; 
+      dff score[4];  //score of player 1
+      dff scoreB[4];  //score of player 2
+      dff timer[31];  //timer for 30 seconds
+      dff diff[2];    //difficulty
+      
+      // setting the buttons. Thx Teck Wu and team.
+      
+      mutton mutton1;
+      mutton mutton2;
+      mutton mutton3;
+      mutton mutton4;
+      
+      mutton mutton5;
+      mutton mutton6;
+      mutton mutton7;
+      mutton mutton8;
+      
+      // init sound for the game. Thx Shun Git.
+      sound sound;
+      millis_counter milli;
+      
+      
+      //random generator and numbers
+      pn_gen pn1;
+      sevensegopdisplay ssd;
+      sevensegnumone alpha; // first num in question
+      sevensegnumone beta; // second num in question
+      sevensegnumone gamma; //option 1 
+      sevensegnumone delta;
+      sevensegnumone sigma;
+      sevensegnumone final; //ans
+
+
+    }
+  }
+  rom_kbc kbctune;
+  alu alu1;
+  sig alufn[6];
+  sig scores[4];
+  sig scoresB[4];
+  sig a[4];
+  sig b[4];
+  sig oa[4];
+  sig ob[4];
+  sig oc[4];
+  sig user[8];
+  sig button;
+  sig buttonB;
+  sig option[4];
+  sig song;
+  sig mutton_flag;
+  sig mutton_flag1;
+  
+  const ADD = 6b0;        //000000
+  const SUB = 6b1;        //000001
+  const AND = 6b011000;   //011000
+  const OR = 6b011110;    //011110
+  const XOR = 6b010110;   
+  const SAME = 6b011010;  
+  const SHL = 6b100000;   
+  const SHR = 6b100001;
+  const SRA = 6b100011;
+  const MULT = 6b000010;  //000010  
+  const OPTIONA = 4b0001;
+  const OPTIONB = 4b0010;
+  const OPTIONC = 4b0100;
+  const OPTIOND = 4b1000;
+  
+  always {
+    reset_cond.in = ~rst_n; // input raw inverted reset signal
+    rst = reset_cond.out;   // conditioned reset
+    //max score = 3
+    //scoreB = 0;
+    
+    led = 8h00;             // turn LEDs off
+    spi_miso = bz;          // not using SPI
+    spi_channel = bzzzz;    // not using flags
+    avr_rx = bz;            // not using serial port
+    
+    mutton1.button = ~button1;            // raw button input
+    mutton2.button = ~button2;            // raw button input
+    mutton3.button = ~button3;            // raw button input
+    mutton4.button = ~button4;            // raw button input
+   
+    mutton5.button = ~button5;            
+    mutton6.button = ~button6;           
+    mutton7.button = ~button7;            
+    mutton8.button = ~button8;        
+     
+    mutton1.reset_flag = 0;
+    mutton2.reset_flag = 0;
+    mutton3.reset_flag = 0;
+    mutton4.reset_flag = 0;
+    
+    mutton5.reset_flag = 0;
+    mutton6.reset_flag = 0;
+    mutton7.reset_flag = 0;
+    mutton8.reset_flag = 0; 
+       
+    kbctune.step = milli.step;
+    sound.notes = kbctune.note;
+    sound.notetype = 1;
+            
+    pn1.seed = 32b0;              // use seed.q as the seed
+    pn1.next = 0;                   // don't generate new numbers
+
+    if(diff.q ==0){
+      alufn = pn1.num[0];
+    }
+    else if(diff.q == 1){
+    case(pn1.num[11:10]){
+      0: alufn = ADD;
+                     
+      1: alufn = SUB;
+                   
+      2: alufn = MULT;
+      3: alufn = ADD;
+              
+      default: alufn = 0;          //ADD
+    }
+    }
+    else{
+    case(pn1.num[13:10]){
+      0: alufn = ADD;
+                     
+      1: alufn = SUB;
+                   
+      2: alufn = MULT;
+      3: alufn = ADD;
+      4: alufn = SUB;
+      5: alufn = AND;
+      6: alufn = OR;
+      7: alufn = XOR;
+      8: alufn = SAME;
+      9: alufn = SHL;
+      10: alufn = SHR;
+      11: alufn = SRA;
+      12: alufn = SUB;
+      13: alufn = AND;
+      14: alufn = SHL;
+      15: alufn = SUB;
+              
+      default: alufn = 0;          //ADD
+    }
+    }
+    
+    scores = score.q;
+    scoresB = scoreB.q;
+    a = pn1.num[3:0];
+    alpha.num = a;
+    b = pn1.num[7:4];
+    beta.num = b;
+    oa = pn1.num[11:8];
+    gamma.num = oa;
+    ob = pn1.num[15:12];
+    delta.num = ob;
+    oc = pn1.num[19:16];
+    sigma.num = oc;
+    ssd.alufn = alufn;
+    
+    ssd.scores=scores;
+    ssd.scoresB=scoresB;
+    
+    //operation
+    pin_a = ssd.a;   //optionval
+    pin_b = ssd.b;
+    pin_c = ssd.c;
+    pin_d = ssd.d;
+    pin_e = ssd.e;
+    pin_f = ssd.f;
+    pin_g = ssd.g;
+    pin_h = ssd.h;
+    pin_i = ssd.i;
+    pin_j = ssd.j;
+    pin_k = ssd.k;
+    
+    //scores
+    score_1 = ssd.o;
+    score_2 = ssd.l;
+    score_3 = ssd.p;
+    score_4 = ssd.q;
+    score_5 = ssd.r;
+    score_6 = ssd.s;
+    score_7 = ssd.t;
+    score_8 = ssd.u;
+    score_9 = ssd.v;
+    
+    
+    // first ques
+    pin_l = alpha.l;
+    pin_m = alpha.m;
+    pin_n = alpha.n;
+    pin_o = alpha.o;
+    pin_p = alpha.p;
+    pin_q = alpha.q;
+    pin_r = alpha.r;
+    pin_s = alpha.s;
+    pin_t = alpha.t;
+    pin_u = alpha.u;
+    pin_v = alpha.v;
+    
+    // second ques   
+    pin_1 = beta.l;  
+    pin_2 = beta.m;
+    pin_3 = beta.n;
+    pin_4 = beta.o;
+    pin_5 = beta.p;
+    pin_6 = beta.q;
+    pin_7 = beta.r;
+    pin_8 = beta.s;
+    pin_9 = beta.t;
+    pin_10 = beta.u;
+    pin_11 = beta.v;
+    
+    
+    //OPTIONA
+    pin_12 = gamma.l;
+    pin_13 = gamma.m;
+    pin_14 = gamma.n;
+    pin_15 = gamma.o;
+    pin_16 = gamma.p;
+    pin_17 = gamma.q;
+    pin_18 = gamma.r;
+    pin_19 = gamma.s;
+    pin_20 = gamma.t;
+    pin_21 = gamma.u;
+    pin_22 = gamma.v;
+    
+    
+    //OPTIONB
+    //pin_23 = delta.l;
+    pin_24 = delta.m;
+    pin_25 = delta.n;
+    pin_26 = delta.o;
+    pin_27 = delta.p;
+    pin_28 = delta.q;
+    pin_29 = delta.r;
+    pin_30 = delta.s;
+    pin_31 = delta.t;
+    pin_32 = delta.u;
+    pin_33 = delta.v;
+    
+    //OPTIONC
+    pin_34 = sigma.l;
+    pin_35 = sigma.m;
+    pin_36 = sigma.n;
+    pin_37 = sigma.o;
+    pin_38 = sigma.p;
+    pin_39 = sigma.q;
+    pin_40 = sigma.r;
+    pin_41 = sigma.s;
+    pin_42 = sigma.t;
+    pin_43 = sigma.u;
+    pin_44 = sigma.v;
+    
+    song = sound.pulse;
+    audio = song;
+
+    alu1.alufn = alufn;
+    
+    mutton_flag = 0;
+    mutton_flag1 = 0;
+    
+    case(pn1.num[21:20]){
+      0: option = OPTIONA;
+         mutton_flag = mutton1.flagout;
+         mutton_flag1 = mutton5.flagout;
+         buttonB = button5;
+      1: option = OPTIONB;
+         mutton_flag = mutton2.flagout;
+         mutton_flag1 = mutton6.flagout;
+         buttonB = button6;
+      2: option = OPTIONC;
+         mutton_flag = mutton3.flagout;
+         mutton_flag1 = mutton7.flagout;
+         buttonB = button7;
+      3: option = OPTIOND;
+         mutton_flag = mutton4.flagout;
+         mutton_flag1 = mutton8.flagout;
+         buttonB = button8;
+      
+      default: option = OPTIONA;
+               button = button1;
+               buttonB = button5;
+    }
+
+    
+
+    alu1.a = a;
+    alu1.b = b;
+    user = io_dip[1];
+
+    final.num = alu1.result;
+      
+    if(option == OPTIONA){
+      pin_12 = final.l;
+      pin_13 = final.m;
+      pin_14 = final.n;
+      pin_15 = final.o;
+      pin_16 = final.p;
+      pin_17 = final.q;
+      pin_18 = final.r;
+      pin_19 = final.s;
+      pin_20 = final.t;
+      pin_21 = final.u;
+      pin_22 = final.v;
+    }
+    else if(option == OPTIONB){
+      //pin_23 = final.l;
+      pin_24 = final.m;
+      pin_25 = final.n;
+      pin_26 = final.o;
+      pin_27 = final.p;
+      pin_28 = final.q;
+      pin_29 = final.r;
+      pin_30 = final.s;
+      pin_31 = final.t;
+      pin_32 = final.u;
+      pin_33 = final.v;
+    }
+    else if(option == OPTIONC){
+      pin_34 = final.l;
+      pin_35 = final.m;
+      pin_36 = final.n;
+      pin_37 = final.o;
+      pin_38 = final.p;
+      pin_39 = final.q;
+      pin_40 = final.r;
+      pin_41 = final.s;
+      pin_42 = final.t;
+      pin_43 = final.u;
+      pin_44 = final.v;
+    }
+    else{
+      pin_34 = final.m;
+      pin_35 = final.l;
+      pin_36 = final.n;
+      pin_37 = final.o;
+      pin_38 = final.p;
+      pin_39 = final.q;
+      pin_40 = final.r;
+      pin_41 = final.s;
+      pin_42 = final.t;
+      pin_43 = final.u;
+      pin_44 = final.v;
+    }
+    
+    
+    
+    
+    case (state.q) {
+      state.DIFF: //difficulty mode
+      song = sound.pulse;
+      audio = song;
+      if(mutton5.flagout){
+        diff.d = 0;
+        mutton5.reset_flag = 1;
+          state.d = state.START;
+      }else if(mutton6.flagout){
+        diff.d = 1;
+        mutton6.reset_flag = 1;
+          state.d = state.START;
+        }else if(mutton7.flagout){
+        diff.d = 2;
+        mutton7.reset_flag = 1;
+          state.d = state.START;
+        }else if(mutton8.flagout){
+        diff.d = 3;
+          mutton8.reset_flag = 1;
+          state.d = state.START;
+        }
+        
+        
+     
+        
+      state.START: //question mode
+      timer.d = timer.q +1; // start the 30 sec timer
+      counter.d = 0; //clock counter is 0 when in START state
+        
+        if(score.q == 10 || scoreB.q == 10){
+          state.d = state.FINISH;
+        }
+
+        if (mutton_flag || mutton_flag1 || timer.q[timer.WIDTH-1] == 1){ //button select
+          pn1.next=1;
+          timer.d = 0;
+          if(mutton_flag){
+            score.d = score.q + 1;   
+          }
+          else if(mutton_flag1){
+            scoreB.d = scoreB.q +1;
+          }       
+          state.d = state.END; //transition to looper
+          mutton1.reset_flag = 1;
+          mutton2.reset_flag = 1;
+          mutton3.reset_flag = 1;
+          mutton4.reset_flag = 1;
+          mutton5.reset_flag = 1;
+          mutton6.reset_flag = 1;
+          mutton7.reset_flag = 1;
+          mutton8.reset_flag = 1;          
+        }
+         
+        
+      state.END:                //DONE WITH TEST
+      counter.d = counter.q+1;
+      counter.d = 0;
+      state.d = state.START;//return to startstate  
+        
+      state.FINISH:
+      counter.d = 0;
+      score.d = 0;
+      scoreB.d = 0;
+      diff.d = 0;
+      state.d = state.DIFF;    //reset to difficulty setting  
+  }
+}
+}

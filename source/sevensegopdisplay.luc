@@ -1,0 +1,879 @@
+module sevensegopdisplay (
+    input clk,  // clock
+    input rst,  // reset
+    input alufn[6],
+    input scores[4],
+    input scoresB[4],    
+    //input num[4],
+    output a,
+    output b,
+    output c,
+    output d,
+    output e,
+    output f,
+    output g,
+    output h,
+    output i,
+    output j,
+    output k,
+    output l,
+    output m,
+    output n,
+    output o,
+    output p,
+    output q,
+    output r,
+    output s,
+    output t,
+    output u,
+    output v
+    
+    //output l
+  ) {
+  
+  .clk(clk) {
+    // The reset conditioner is used to synchronize the reset signal to the FPGA
+    // clock. This ensures the entire FPGA comes out of reset at the same time.
+    
+    .rst(rst) {
+      fsm state = {START,END};       // states
+      dff counter[40]; 
+      //dff addr [23];                   // current address
+      //dff error [7];                   // number of errors
+      //dff seed[32];                   // seed for each run
+      pn_gen pn1;
+    }
+  }
+  
+  
+  const X = 10;
+
+  
+  
+  
+  always {
+    pn1.seed = 32b0;              // use seed.q as the seed
+    pn1.next = 0;                   // don't generate new numbers
+    
+  if(pn1.num[0]==0){
+     if(scores == 1){
+            l=1;
+        m=0;
+        n=0;
+        o=0;
+        p=1;
+        q=0;//1
+        r=0;
+        s=1;
+        t=1;
+        u=1;
+        v=1; 
+    }else if(scores == 2){
+            //2
+        l=1;
+        m=0;
+        n=0;
+        o=0;
+        p=0;
+        q=0;
+        r=1;
+        s=0;
+        t=0;
+        u=1;
+        v=0;
+    }else if(scores == 3){
+            //3
+        l=1;
+        m=0;
+        n=0;
+        o=0;
+        p=0;
+        q=0;
+        r=0;
+        s=0;
+        t=1;
+        u=1;
+        v=0; 
+    }else if(scores == 4){
+            //1
+          l = 1; 
+    m = 0;
+    n = 0;
+    o = 0;
+    p = 1;
+    q = 0;
+    r = 0;
+    s = 1;
+    t = 1;
+    u = 0;
+    v = 0;
+    }else if(scores == 5){
+            //2
+    l = 1; 
+    m = 0;
+    n = 0;
+    o = 0;
+    p = 0;
+    q = 1;
+    r = 0;
+    s = 0;
+    t = 1;
+    u = 0;
+    v = 0;
+    }else if(scores == 6){
+                //3
+    l = 1; 
+    m = 0;
+    n = 0;
+    o = 0;
+    p = 0;
+    q = 1;
+    r = 0;
+    s = 0;
+    t = 0;
+    u = 0;
+    v = 0;
+    }else if(scores == 7){
+                //1
+          l = 1; 
+    m = 0;
+    n = 0;
+    o = 0;
+    p = 0;
+    q = 0;
+    r = 0;
+    s = 1;
+    t = 1;
+    u = 1;
+    v = 1;
+    }else if(scores == 8){
+                //1
+          l = 1; 
+    m = 0;
+    n = 0;
+    o = 0;
+    p = 0;
+    q = 0;
+    r = 0;
+    s = 0;
+    t = 0;
+    u = 0;
+    v = 0;
+    }else if(scores == 9){
+                //1
+          l = 1; 
+    m = 0;
+    n = 0;
+    o = 0;
+    p = 0;
+    q = 0;
+    r = 0;
+    s = 0;
+    t = 1;
+    u = 0;
+    v = 0;
+    }else{
+        l=1;
+        m=0;
+        n=0;
+        o=0;
+        p=0;
+        q=0;
+        r=0;
+        s=0;
+        t=0;
+        u=0;
+        v=1;   
+    }
+    }else{
+           if(scoresB == 1){
+            l=0;
+        m=0;
+        n=0;
+        o=1;
+        p=1;
+        q=0;//1
+        r=0;
+        s=1;
+        t=1;
+        u=1;
+        v=1; 
+    }else if(scoresB == 2){
+            //2
+        l=0;
+        m=0;
+        n=0;
+        o=1;
+        p=0;
+        q=0;
+        r=1;
+        s=0;
+        t=0;
+        u=1;
+        v=0;
+    }else if(scoresB == 3){
+            //3
+        l=0;
+        m=0;
+        n=0;
+        o=1;
+        p=0;
+        q=0;
+        r=0;
+        s=0;
+        t=1;
+        u=1;
+        v=0; 
+    }else if(scoresB == 4){
+            //1
+          l = 0; 
+    m = 0;
+    n = 0;
+    o = 1;
+    p = 1;
+    q = 0;
+    r = 0;
+    s = 1;
+    t = 1;
+    u = 0;
+    v = 0;
+    }else if(scoresB == 5){
+            //2
+    l = 0; 
+    m = 0;
+    n = 0;
+    o = 1;
+    p = 0;
+    q = 1;
+    r = 0;
+    s = 0;
+    t = 1;
+    u = 0;
+    v = 0;
+    }else if(scoresB == 6){
+                //3
+          l = 0; 
+    m = 0;
+    n = 0;
+    o = 1;
+    p = 0;
+    q = 1;
+    r = 0;
+    s = 0;
+    t = 0;
+    u = 0;
+    v = 0;
+    }else if(scoresB == 7){
+                //1
+          l = 0; 
+    m = 0;
+    n = 0;
+    o = 1;
+    p = 0;
+    q = 0;
+    r = 0;
+    s = 1;
+    t = 1;
+    u = 1;
+    v = 1;
+    }else if(scoresB == 8){
+                //1
+          l = 0; 
+    m = 0;
+    n = 0;
+    o = 1;
+    p = 0;
+    q = 0;
+    r = 0;
+    s = 0;
+    t = 0;
+    u = 0;
+    v = 0;
+    }else if(scoresB == 9){
+                //1
+          l = 0; 
+    m = 0;
+    n = 0;
+    o = 1;
+    p = 0;
+    q = 0;
+    r = 0;
+    s = 0;
+    t = 1;
+    u = 0;
+    v = 0;
+    }else{
+        l=0;
+        m=0;
+        n=0;
+        o=1;
+        p=0;
+        q=0;
+        r=0;
+        s=0;
+        t=0;
+        u=0;
+        v=1;   
+      }
+    }
+    
+
+    
+    
+    
+    //ADD
+    /*
+    a=0;
+    b=0;
+    c=0;
+    d=0;
+    e=0;
+    f=0;
+    g=0;//C segment
+    h=0;
+    i=0;
+    j=0;
+    k=0; 
+    l=0;
+    */ 
+               
+    //SUB
+    
+    if (alufn==1 & pn1.num[1:0]==0){
+      //S
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=0;
+      f=1;//1
+      g=0;
+      h=0;
+      i=1;
+      j=0;
+      k=0;  
+      
+      
+    }
+     
+    else if(alufn==1 & pn1.num[1:0]==1){
+      //U
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=1;
+      f=0;
+      g=0;//1
+      h=0;//1
+      i=0;//1
+      j=0;
+      k=1;//erase middle segment  
+      
+      
+    }
+    else if(alufn==1 & pn1.num[1:0]==2){
+      //B
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=0;
+      f=0;
+      g=0;//C segment
+      h=0;
+      i=0;
+      j=0;
+      k=0; 
+     
+      
+    }
+    else if (alufn==0 & pn1.num[1:0]==0){
+      //A
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=0;
+      f=0;//1
+      g=0;
+      h=1;
+      i=0;
+      j=0;
+      k=0; 
+     
+      
+      
+      
+    }
+     
+    else if(alufn==0 & pn1.num[1:0]==1){
+      //D
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=1;
+      f=0;
+      g=0;
+      h=0;
+      i=0;
+      j=1;
+      k=0; 
+     
+      
+    }
+    else if(alufn==0 & pn1.num[1:0]==2){
+      //D
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=1;
+      f=0;
+      g=0;
+      h=0;
+      i=0;
+      j=1;
+      k=0;
+     
+      
+    }
+    
+    else if (alufn==2 & pn1.num[1:0]==0){
+      //P
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=0;
+      f=0;
+      g=1;
+      h=1;
+      i=0;
+      j=0;
+      k=0;
+     
+      
+      
+      
+    }
+     
+    else if(alufn==2 & pn1.num[1:0]==1){
+      //R
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=1;
+      f=1;
+      g=1;
+      h=1;
+      i=0;
+      j=1;
+      k=0;  
+      
+      
+    }
+    else if(alufn==2 & pn1.num[1:0]==2){
+      //D
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=1;
+      f=0;
+      g=0;
+      h=0;
+      i=0;
+      j=1;
+      k=0;
+      
+      
+    }
+
+    
+    else if (alufn==6b011000 & pn1.num[1:0]==0){
+      //A
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=0;
+      f=0;
+      g=0;
+      h=1;
+      i=0;
+      j=0;
+      k=0;
+     
+      
+      
+      
+    }
+     
+    else if(alufn==6b011000 & pn1.num[1:0]==1){
+      //N
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=1;
+      f=1;
+      g=0;
+      h=1;
+      i=0;
+      j=1;
+      k=0;  
+      
+      
+    }
+    else if(alufn==6b011000 & pn1.num[1:0]==2){
+      //D
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=1;
+      f=0;
+      g=0;
+      h=0;
+      i=0;
+      j=1;
+      k=0;
+      
+      
+    }
+    else if (alufn==6b011110 & pn1.num[1:0]==0){
+      //nothing
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=1;
+      f=1;
+      g=1;
+      h=1;
+      i=1;
+      j=1;
+      k=1;
+     
+      
+      
+      
+    }
+     
+    else if(alufn==6b011110 & pn1.num[1:0]==1){
+      //o
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=0;
+      f=0;
+      g=0;
+      h=0;
+      i=0;
+      j=0;
+      k=1;  
+      
+      
+    }
+    else if(alufn==6b011110 & pn1.num[1:0]==2){
+      //R
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=1;
+      f=1;
+      g=1;
+      h=1;
+      i=0;
+      j=1;
+      k=0;
+      
+      
+    }
+    else if (alufn==6b010110 & pn1.num[1:0]==0){
+      //E
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=0;
+      f=1;
+      g=1;
+      h=0;
+      i=0;
+      j=0;
+      k=0;
+    }
+     
+    else if(alufn==6b010110 & pn1.num[1:0]==1){
+      //o
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=0;
+      f=0;
+      g=0;
+      h=0;
+      i=0;
+      j=0;
+      k=1;  
+      
+      
+    }
+    else if(alufn==6b010110 & pn1.num[1:0]==2){
+      //R
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=1;
+      f=1;
+      g=1;
+      h=1;
+      i=0;
+      j=1;
+      k=0;
+      
+      
+    }
+    else if (alufn==6b011010 & pn1.num[1:0]==0){
+      //L
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=1;
+      f=1;
+      g=1;
+      h=0;
+      i=0;
+      j=0;
+      k=1;
+    }
+     
+    else if(alufn==6b011010 & pn1.num[1:0]==1){
+      //D
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=1;
+      f=0;
+      g=0;
+      h=0;
+      i=0;
+      j=1;
+      k=0;
+      
+      
+    }
+    else if(alufn==6b011010 & pn1.num[1:0]==2){
+      //R
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=1;
+      f=1;
+      g=1;
+      h=1;
+      i=0;
+      j=1;
+      k=0;
+    }         
+    else if (alufn==6b100000 & pn1.num[1:0]==0){
+      //S
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=0;
+      f=1;
+      g=0;
+      h=0;
+      i=1;
+      j=0;
+      k=0; 
+    }
+     
+    else if(alufn==6b100000 & pn1.num[1:0]==1){
+      //H
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=1;
+      f=0;
+      g=0;
+      h=1;
+      i=0;
+      j=0;
+      k=0;
+      
+      
+    }
+    else if(alufn==6b100000 & pn1.num[1:0]==2){
+      //L
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=1;
+      f=1;
+      g=1;
+      h=0;
+      i=0;
+      j=0;
+      k=1;
+    }      
+    else if (alufn==6b100001 & pn1.num[1:0]==0){
+      //S
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=0;
+      f=1;
+      g=0;
+      h=0;
+      i=1;
+      j=0;
+      k=0; 
+    }
+     
+    else if(alufn==6b100001 & pn1.num[1:0]==1){
+      //H
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=1;
+      f=0;
+      g=0;
+      h=1;
+      i=0;
+      j=0;
+      k=0;
+      
+      
+    }
+    else if(alufn==6b100001 & pn1.num[1:0]==2){
+      //R
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=1;
+      f=1;
+      g=1;
+      h=1;
+      i=0;
+      j=1;
+      k=0;
+    }
+    else if (alufn==6b100011 & pn1.num[1:0]==0){
+      //S
+      a=1;
+      b=0;
+      c=0;
+      d=0;
+      e=0;
+      f=1;
+      g=0;
+      h=0;
+      i=1;
+      j=0;
+      k=0; 
+    }
+     
+    else if(alufn==6b100011 & pn1.num[1:0]==1){
+      //R
+      a=0;
+      b=1;
+      c=0;
+      d=0;
+      e=1;
+      f=1;
+      g=1;
+      h=1;
+      i=0;
+      j=1;
+      k=0;
+      
+      
+    }
+    else if(alufn==6b100011 & pn1.num[1:0]==2){
+      //A
+      a=0;
+      b=0;
+      c=1;
+      d=0;
+      e=0;
+      f=0;
+      g=0;
+      h=1;
+      i=0;
+      j=0;
+      k=0; 
+    }                                 
+    else{
+      a=0;
+      b=0;
+      c=0;
+      d=0;
+      e=0;
+      f=0;
+      g=0;
+      h=0;
+      i=0;
+      j=0;
+      k=0; 
+      l=0;
+      m=0;
+      n=0;
+      o=0;
+      p=0;
+      q=0;
+      r=0;//C segment
+      s=0;
+      t=0;
+      u=0;
+      v=0; 
+      
+      
+    }
+    case (state.q) {
+      state.START: //normal functioning alu (without test)
+      //io_sel = b0111; // select first digit
+      //io_seg = 7b10010; //display letter S
+      counter.d = 0; //clock counter is 0 when in START state
+      pn1.next=1;
+      state.d = state.END; //transition to testing the alu
+        /*
+        if (io_dip[2][7]==1){ //pressing first switch of right dip switches starts TEST states
+          
+          pn1.next=1;
+          state.d = state.END; //transition to testing the alu
+        }
+        */        
+      state.END:                //DONE WITH TEST
+      counter.d = counter.q+1;
+      //io_sel = b1101; // select first digit
+      //io_seg = 7b110; //display letter E  
+        if (counter.q[X]==1){
+          
+          
+          counter.d = 0;
+          state.d = state.START;//return to startstate
+        }  
+        
+      
+  }
+  }
+}

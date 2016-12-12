@@ -1,0 +1,30 @@
+/*
+
+   Implementing shifters (Does SHL, SHR and SRA)
+   
+ */
+
+
+module shifters (
+    input alufn2[2],  
+    input a[8],
+    input b[8],  
+    output shifting[8]
+
+  ) {
+  
+  
+  always {
+  
+    //alufn[1:0] first 2 bits 
+    //b[4:0] first 5 bits
+     case(alufn2){
+      0: shifting = a << b;           //SHL case
+      1: shifting = a >> b;           //SHR case
+      3: shifting = $signed(a) >>> b; //SRA case (signed since we are shifting with sign bit in consideration)
+              
+      default: shifting = 0;          //default
+  
+  }
+}
+}
